@@ -14,7 +14,8 @@ import { connect } from 'react-redux';
 // react view와 redux state를 연결시켜주기 위해선, 
 // 제 3의 라이브러리 react-redux를 사용해야! (원래 둘은 완전 별개의 라이브러리임)
 // react-redux를 써야지만 그 두개가 연결될 수 있음~!
-
+import selectBook from '../actions/index';
+import { bindActionCreators } from 'redux';
 
 class BookList extends Component {
 
@@ -25,7 +26,10 @@ class BookList extends Component {
 		return this.props.books.map((book) => {
 			return (
 				// list에는 각각 요소에 key를 부여해줘야 리액트에서 에러가 안남
-				<li key={book.title} className="list-group-item">
+				<li 
+					key={book.title} 
+					onClick={() => this.props.selectBook(book)}
+					className="list-group-item">
 					{book.title}
 				</li>
 			);
@@ -53,7 +57,24 @@ function mapStateToProps(state) {
 // 실질적으로 이 mapStateToProps함수를 통해 react와 redux가 연결되는거지!!
 
 
-export default connect(mapStateToProps)(BookList);
+// Anything returned from this function will end up as props
+// on the BookList container
+function mapDispatchToProps(dispatch) {
+	// whenever selectBook is called, 
+	// the result should be passed to all of our reducers.
+	return bindActionCreators({ selectBook: selectBook }, dispatch);
+	// bindActionCreators - dispatch ; 
+	// 여기 actioncreator가 만든 action이 반환한 값을 모든 reducer들한테로 전달해줘!
+}
+// -> 이제 BookList 컨테이너 안에서 this.props.selectBook이라고 호출 가능!
+//    그리고 그렇게 this.props.selectBook을 호출하면, 
+//    그 즉시 해당 selectBook action creator가 또 호출되는거지!@
+
+
+// Promote BookList from a component to a container
+// - it needs to know about this new dispatch method, selectBook.
+// Make it available as a prop.
+export default connect(mapStateToProps, mapDispatchToProps)(BookList);
 // 우린 plain BookList 컴포넌트가 아닌, 
 // redux랑 연결되어 fully-functional한 container역할을 해줄
 // container로서의 BookList를 export default 시켜줄것임! 
@@ -68,3 +89,4 @@ export default connect(mapStateToProps)(BookList);
 // 2. connect를 사용함으로써 컨테이너를 생성하는데, 
 //    application state가 바뀔때마다 mapStateToProps함수 안의 return 오브젝트 값이
 //    업데이트 된 state값을 반영하여 BookList컴포넌트의 this.props로 들어갈것임
+
