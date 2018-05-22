@@ -28,7 +28,7 @@ class BookList extends Component {
 				// list에는 각각 요소에 key를 부여해줘야 리액트에서 에러가 안남
 				<li 
 					key={book.title} 
-					onClick={() => this.props.selectBook(book)}
+					onClick={()=> this.props.selectBook(book)}
 					className="list-group-item">
 					{book.title}
 				</li>
